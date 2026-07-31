@@ -111,13 +111,29 @@ automatically if the live API can't be reached, so the page is never a dead scre
 
 ## Status
 
-Verified working: address creation, session restore across reloads, custom and random
-addresses, address history, polling, message rendering (HTML and plain text), remote-image
-blocking, inbox and message deletion, demo-mode fallback, light/dark themes, mobile layout.
+Exercised against the live API in a real browser: address creation, session restore across
+reloads, custom and random addresses, the address-history switcher, new-mail detection and
+its toast, message rendering (HTML and plain text), remote-image blocking, script-in-email
+containment, message and inbox deletion (confirmed dead server-side — the credentials stop
+authenticating), demo-mode fallback, light/dark themes, and the phone layout.
 
-Inbound SMTP delivery was not verified from the development machine, whose ISP blocks outbound
-port 25 — the receiving side belongs to mail.tm and their MX (`in.mail.tm`) resolves and is
-live. If mail doesn't arrive, check <https://mail.tm> is up before suspecting this code.
+Two things are **not** covered by that:
+
+- **Inbound SMTP delivery.** The development machine's ISP blocks outbound port 25, so no mail
+  could be sent to a Tempbox address from here. The receiving half is mail.tm's; their MX
+  (`in.mail.tm`) resolves and answers. If mail never arrives, check <https://mail.tm> is up
+  before suspecting this code.
+- **The automatic 5s poll timer**, which only runs in a foreground tab. The test browser
+  reported itself permanently hidden, so polling was verified through the manual refresh path
+  and the pause/resume logic rather than by watching the timer tick.
+
+### A browser quirk worth knowing about
+
+Some Chromium embeddings never fire the `<dialog>` `close` event — not on form submission,
+not even on an explicit `close()`. Both dialogs therefore resolve from `submit` and `cancel`,
+which are dependable, and treat `close` as a backstop. If you refactor `dialogResult()` in
+`js/ui.js` down to "just listen for close", the Change and Delete buttons will silently stop
+working in exactly those browsers.
 
 ## Licence
 

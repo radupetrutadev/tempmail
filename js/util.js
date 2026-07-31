@@ -66,7 +66,9 @@ TM.util = (function () {
   }
 
   function initials(name, address) {
-    var src = (name || '').trim() || (address || '').trim();
+    /* Fall back to the local part only: "plain@example.org" should read as
+       "P", not "PO" from plain@example + org. */
+    var src = (name || '').trim() || (address || '').trim().split('@')[0];
     if (!src) return '?';
     var parts = src.replace(/[<>"]/g, '').split(/[\s._-]+/).filter(Boolean);
     if (!parts.length) return '?';

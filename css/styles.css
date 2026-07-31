@@ -549,8 +549,6 @@ html[data-theme="light"] .icon-moon { display: none; }
 }
 .input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .select { flex: 0 1 auto; max-width: 55%; cursor: pointer; }
-.field-error { margin-top: 8px; font-size: 13px; color: var(--danger); }
-.field-error[hidden] { display: none; }
 
 .history { margin-top: 20px; border-top: 1px solid var(--line-soft); padding-top: 14px; }
 .history[hidden] { display: none; }

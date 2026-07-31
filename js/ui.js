@@ -22,7 +22,7 @@ TM.ui = (function () {
       'btnRefreshList', 'paneReader', 'reader', 'readerEmpty', 'readerLoading', 'readerSubject',
       'readerAvatar', 'readerName', 'readerAddr', 'readerDate', 'readerTo', 'readerBody',
       'attachments', 'btnBack', 'btnDeleteMsg', 'btnImages', 'toasts', 'customDialog',
-      'customForm', 'customLocal', 'customDomain', 'customError', 'historyWrap', 'historyList',
+      'customLocal', 'customDomain', 'historyWrap', 'historyList',
       'confirmDialog', 'confirmTitle', 'confirmText', 'confirmOk', 'pollNote'
     ].forEach(function (id) { el[id] = document.getElementById(id); });
 
@@ -318,6 +318,45 @@ TM.ui = (function () {
   /* ── dialogs ───────────────────────────────────────────────────── */
   function supportsDialog(d) { return d && typeof d.showModal === 'function'; }
 
+  /* Not every engine fires `close` on a <dialog> — some Chromium embeddings
+     never fire it at all, even for an explicit close(). `submit` and `cancel`
+     are reliable, so those drive the result and `close` is only a backstop.
+     settle() makes sure the first one to arrive wins. */
+  function dialogResult(dialog, decide) {
+    var form = dialog.querySelector('form');
+
+    return new Promise(function (resolve) {
+      var done = false;
+
+      function settle(value) {
+        if (done) return;
+        done = true;
+        form.removeEventListener('submit', onSubmit);
+        dialog.removeEventListener('cancel', onCancel);
+        dialog.removeEventListener('close', onClose);
+        resolve(value);
+      }
+
+      function onSubmit(ev) {
+        var value = (ev.submitter && ev.submitter.value) || dialog.returnValue;
+        /* Let the dialog finish closing before the caller acts on the answer. */
+        setTimeout(function () { settle(decide(value)); }, 0);
+      }
+      function onCancel() { settle(decide('cancel')); }
+      function onClose() { settle(decide(dialog.returnValue)); }
+
+      form.addEventListener('submit', onSubmit);
+      dialog.addEventListener('cancel', onCancel);
+      dialog.addEventListener('close', onClose);
+
+      dialog.returnValue = '';
+      dialog.showModal();
+
+      /* Exposed so in-dialog buttons can resolve without a close event. */
+      dialog.__settle = settle;
+    });
+  }
+
   function confirmAction(title, text, okLabel) {
     if (!supportsDialog(el.confirmDialog)) {
       return Promise.resolve(window.confirm(title + '\n\n' + text));
@@ -326,14 +365,8 @@ TM.ui = (function () {
     el.confirmText.textContent = text;
     el.confirmOk.textContent = okLabel || 'Delete';
 
-    return new Promise(function (resolve) {
-      function onClose() {
-        el.confirmDialog.removeEventListener('close', onClose);
-        resolve(el.confirmDialog.returnValue === 'ok');
-      }
-      el.confirmDialog.addEventListener('close', onClose);
-      el.confirmDialog.returnValue = '';
-      el.confirmDialog.showModal();
+    return dialogResult(el.confirmDialog, function (value) {
+      return value === 'ok';
     });
   }
 
@@ -346,7 +379,6 @@ TM.ui = (function () {
     }
 
     el.customLocal.value = '';
-    el.customError.hidden = true;
     el.customDomain.innerHTML = domains.map(function (d) {
       return '<option value="' + u.escapeHtml(d) + '">' + u.escapeHtml(d) + '</option>';
     }).join('');
@@ -368,35 +400,22 @@ TM.ui = (function () {
       b.addEventListener('click', function () {
         restored = entry;
         el.customDialog.close('restore');
+        /* close() alone is not dependable — resolve the promise explicitly. */
+        if (el.customDialog.__settle) el.customDialog.__settle({ action: 'restore', entry: entry });
       });
       li.appendChild(b);
       el.historyList.appendChild(li);
     });
 
-    return new Promise(function (resolve) {
-      function onClose() {
-        el.customDialog.removeEventListener('close', onClose);
-        var v = el.customDialog.returnValue;
-        if (v === 'restore' && restored) return resolve({ action: 'restore', entry: restored });
-        if (v !== 'create') return resolve(null);
-
-        var local = el.customLocal.value.trim().toLowerCase();
-        resolve({
-          action: 'create',
-          localPart: local || null,
-          domain: el.customDomain.value
-        });
-      }
-      el.customDialog.addEventListener('close', onClose);
-      el.customDialog.returnValue = '';
-      el.customDialog.showModal();
-      setTimeout(function () { el.customLocal.focus(); }, 30);
+    var promise = dialogResult(el.customDialog, function (value) {
+      if (value === 'restore' && restored) return { action: 'restore', entry: restored };
+      if (value !== 'create') return null;
+      var local = el.customLocal.value.trim().toLowerCase();
+      return { action: 'create', localPart: local || null, domain: el.customDomain.value };
     });
-  }
 
-  function dialogError(msg) {
-    el.customError.textContent = msg;
-    el.customError.hidden = !msg;
+    setTimeout(function () { el.customLocal.focus(); }, 30);
+    return promise;
   }
 
   return {
@@ -417,7 +436,6 @@ TM.ui = (function () {
     toast: toast,
     confirmAction: confirmAction,
     openAddressDialog: openAddressDialog,
-    dialogError: dialogError,
     toggleTheme: toggleTheme
   };
 })();

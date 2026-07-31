@@ -127,12 +127,19 @@
     ui.renderList([], null, null);
     ui.clearReader();
     schedulePoll();
+
+    /* Warm the domain list so the "Change" dialog opens instantly. A restored
+       session never calls createAccount(), so nothing else would fetch it. */
+    state.provider.domains().catch(function () {});
   }
 
   /* ── polling ───────────────────────────────────────────────────── */
   function schedulePoll() {
     stopPolling();
-    if (document.hidden || !state.session) return;
+    if (!state.session) return;
+    /* Background tabs don't poll — the label has to say so, including when the
+       page was loaded hidden and no visibilitychange ever fired. */
+    if (document.hidden) { ui.setPollNote('paused'); return; }
     ui.setPollNote('checking every ' + Math.round(state.pollDelay / 1000) + 's');
     state.pollTimer = setTimeout(function () {
       refresh(false).then(schedulePoll, schedulePoll);
