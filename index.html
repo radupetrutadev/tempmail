@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempbox — Free Temporary Email Inbox</title>
+<meta name="description" content="Tempbox gives you a disposable email address that receives real mail. No signup, no password, no spam in your real inbox.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="./">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="5" width="19" height="14" rx="3"></rect>
+        <path d="m3.5 7.5 7.06 5.3a2.4 2.4 0 0 0 2.88 0L20.5 7.5"></path>
+      </svg>
+    </span>
+    <span class="brand-name">Tempbox</span>
+  </a>
+
+  <nav class="topbar-actions">
+    <span id="connBadge" class="badge badge-live" title="Connection status">
+      <span class="dot"></span><span id="connText">Connecting…</span>
+    </span>
+    <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle colour theme" title="Toggle colour theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"></path>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.2 8.2 0 1 0 10.2 10.2Z"></path>
+      </svg>
+    </button>
+  </nav>
+</header>
+
+<main>
+  <!-- ── Address card ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <h1 class="hero-title">Your temporary email address</h1>
+    <p class="hero-sub">Real, working inbox. No signup. Use it anywhere you don't want to hand over your own address.</p>
+
+    <div class="addr-card">
+      <div class="addr-row">
+        <button id="addrCopy" class="addr-value" type="button" title="Click to copy">
+          <span id="addrText" class="addr-text is-loading">generating address…</span>
+          <svg class="addr-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="12" height="12" rx="2.5"></rect>
+            <path d="M15 6.5V5.5A2.5 2.5 0 0 0 12.5 3H5.5A2.5 2.5 0 0 0 3 5.5v7A2.5 2.5 0 0 0 5.5 15h1"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="addr-actions">
+        <button id="btnCopy" class="btn btn-primary" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"></rect><path d="M15 6.5V5.5A2.5 2.5 0 0 0 12.5 3H5.5A2.5 2.5 0 0 0 3 5.5v7A2.5 2.5 0 0 0 5.5 15h1"></path></svg>
+          Copy
+        </button>
+        <button id="btnRefresh" class="btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-.7 4.3"></path><path d="M20 4.5V11h-6.5"></path></svg>
+          Refresh
+        </button>
+        <button id="btnChange" class="btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11a4 4 0 0 1 0 8H9"></path><path d="m7 4-3 3 3 3"></path><path d="m17 12 3 3-3 3"></path></svg>
+          Change
+        </button>
+        <button id="btnDelete" class="btn btn-danger" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6.5 7 7.4 19a1.6 1.6 0 0 0 1.6 1.5h6a1.6 1.6 0 0 0 1.6-1.5L17.5 7"></path></svg>
+          Delete
+        </button>
+      </div>
+
+      <p class="addr-meta" id="addrMeta">Mail arriving at this address shows up below automatically.</p>
+    </div>
+  </section>
+
+  <!-- ── Mailbox ──────────────────────────────────────────────────── -->
+  <section class="mailbox" id="mailbox">
+    <div class="pane pane-list" id="paneList">
+      <div class="pane-head">
+        <h2 class="pane-title">Inbox <span id="inboxCount" class="count">0</span></h2>
+        <div class="pane-head-right">
+          <span id="pollNote" class="poll-note">checking every 5s</span>
+          <button id="btnRefreshList" class="icon-btn icon-btn-sm" type="button" aria-label="Check for new mail" title="Check for new mail">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-.7 4.3"></path><path d="M20 4.5V11h-6.5"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <ul class="msg-list" id="msgList" role="list"></ul>
+
+      <div class="empty" id="emptyState">
+        <div class="empty-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="empty-title">Waiting for incoming email</p>
+        <p class="empty-sub">Your inbox is empty. Send something to the address above and it will land here within seconds.</p>
+      </div>
+    </div>
+
+    <div class="pane pane-reader" id="paneReader">
+      <div class="reader-empty" id="readerEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2.5" y="5" width="19" height="14" rx="3"></rect><path d="m3.5 7.5 7.06 5.3a2.4 2.4 0 0 0 2.88 0L20.5 7.5"></path>
+        </svg>
+        <p>Select a message to read it</p>
+      </div>
+
+      <article class="reader" id="reader" hidden>
+        <div class="reader-bar">
+          <button id="btnBack" class="icon-btn icon-btn-sm reader-back" type="button" aria-label="Back to inbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+          </button>
+          <div class="reader-bar-spacer"></div>
+          <button id="btnImages" class="btn btn-ghost btn-sm" type="button" hidden>Load remote images</button>
+          <button id="btnDeleteMsg" class="icon-btn icon-btn-sm" type="button" aria-label="Delete this message" title="Delete this message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6.5 7 7.4 19a1.6 1.6 0 0 0 1.6 1.5h6a1.6 1.6 0 0 0 1.6-1.5L17.5 7"></path></svg>
+          </button>
+        </div>
+
+        <header class="reader-head">
+          <h2 class="reader-subject" id="readerSubject"></h2>
+          <div class="reader-from">
+            <span class="avatar" id="readerAvatar" aria-hidden="true"></span>
+            <div class="reader-from-text">
+              <span class="reader-name" id="readerName"></span>
+              <span class="reader-addr" id="readerAddr"></span>
+            </div>
+            <time class="reader-date" id="readerDate"></time>
+          </div>
+          <div class="reader-to" id="readerTo"></div>
+        </header>
+
+        <div class="attachments" id="attachments" hidden></div>
+
+        <div class="reader-body" id="readerBody"></div>
+      </article>
+
+      <div class="reader-loading" id="readerLoading" hidden>
+        <span class="spinner"></span> Loading message…
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Info ─────────────────────────────────────────────────────── -->
+  <section class="info">
+    <h2 class="info-title">How it works</h2>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-n">1</span>
+        <h3>Take the address</h3>
+        <p>An address is generated for you the moment the page loads. Copy it with one click — nothing to sign up for.</p>
+      </li>
+      <li class="step">
+        <span class="step-n">2</span>
+        <h3>Use it anywhere</h3>
+        <p>Paste it into a signup form, a download gate, a Wi-Fi portal — anywhere you'd rather not give out your real address.</p>
+      </li>
+      <li class="step">
+        <span class="step-n">3</span>
+        <h3>Read the mail</h3>
+        <p>Messages appear here automatically, usually within a few seconds. Grab your confirmation link, then walk away.</p>
+      </li>
+    </ol>
+
+    <h2 class="info-title">Questions</h2>
+    <div class="faq">
+      <details>
+        <summary>Is this a real inbox?</summary>
+        <p>Yes. The address accepts real SMTP mail from anywhere on the internet — it isn't a simulation. Delivery normally takes a few seconds.</p>
+      </details>
+      <details>
+        <summary>How long does the address last?</summary>
+        <p>It stays yours as long as you keep it in this browser — it's saved locally and restored when you come back. Messages themselves are held for roughly seven days by the mail backend, then dropped.</p>
+      </details>
+      <details>
+        <summary>Can I send email from it?</summary>
+        <p>No. Tempbox is receive-only, which is what keeps it useless to spammers. Reply links and confirmation codes work fine; outbound mail does not.</p>
+      </details>
+      <details>
+        <summary>Is it private?</summary>
+        <p>Anyone who knows or guesses the address can read its mail — random addresses are not secret. Never use a disposable address for banking, government, or account recovery. Remote images are blocked until you ask for them, so tracking pixels don't fire on open.</p>
+      </details>
+      <details>
+        <summary>What happens when I hit Delete?</summary>
+        <p>The address and everything in it are destroyed on the backend and a fresh address is issued. There's no undo.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Tempbox — a disposable inbox for the throwaway parts of the internet.</p>
+  <p class="footer-warn">Don't use a temporary address for anything you'd mind a stranger reading.</p>
+</footer>
+
+<!-- ── Custom address dialog ──────────────────────────────────────── -->
+<dialog id="customDialog" class="dialog">
+  <form method="dialog" class="dialog-form" id="customForm">
+    <h2 class="dialog-title">New address</h2>
+    <p class="dialog-sub">Pick your own name, or leave it blank for a random one. Your current address and its mail are kept and you can switch back from the history below.</p>
+
+    <div class="field-row">
+      <input id="customLocal" class="input" type="text" placeholder="your-name" autocomplete="off" spellcheck="false" maxlength="40" pattern="[A-Za-z0-9_-]*" title="Letters, numbers, dashes and underscores">
+      <span class="at">@</span>
+      <select id="customDomain" class="input select"></select>
+    </div>
+    <p class="field-error" id="customError" hidden></p>
+
+    <div class="history" id="historyWrap" hidden>
+      <h3 class="history-title">Recent addresses</h3>
+      <ul class="history-list" id="historyList" role="list"></ul>
+    </div>
+
+    <!-- Create is first in the DOM so Enter in the name field submits it rather
+         than Cancel; CSS `order` puts it back on the right. -->
+    <div class="dialog-actions">
+      <button class="btn btn-primary btn-confirm" id="customCreate" value="create" type="submit">Create address</button>
+      <button class="btn btn-cancel" value="cancel" type="submit" formnovalidate>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ── Confirm dialog ─────────────────────────────────────────────── -->
+<dialog id="confirmDialog" class="dialog">
+  <form method="dialog" class="dialog-form">
+    <h2 class="dialog-title" id="confirmTitle">Are you sure?</h2>
+    <p class="dialog-sub" id="confirmText"></p>
+    <!-- Cancel stays the default action here: Enter should not destroy an inbox. -->
+    <div class="dialog-actions">
+      <button class="btn" value="cancel" type="submit" formnovalidate>Cancel</button>
+      <button class="btn btn-danger" value="ok" type="submit" id="confirmOk">Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="js/util.js"></script>
+<script src="js/store.js"></script>
+<script src="js/providers/mailtm.js"></script>
+<script src="js/providers/demo.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
